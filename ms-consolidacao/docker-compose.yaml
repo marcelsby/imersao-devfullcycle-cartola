@@ -1,0 +1,16 @@
+services:
+  mysql:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: courses
+      MYSQL_PASSWORD: root
+    ports:
+      - "3306:3306"
+    ulimits:
+      # https://github.com/docker-library/mysql/issues/579#issuecomment-1075119349
+      nproc: 65535
+      nofile:
+        soft: 26677
+        hard: 46677
