@@ -9,9 +9,9 @@ import (
 )
 
 type AddMyTeamInput struct {
-	ID    string
-	Name  string
-	Score int
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Score int    `json:"score"`
 }
 
 type AddMyTeamUseCase struct {

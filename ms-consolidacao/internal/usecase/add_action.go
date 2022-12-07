@@ -9,11 +9,11 @@ import (
 )
 
 type AddActionInput struct {
-	MatchID  string
-	TeamID   string
-	PlayerID string
-	Minute   int
-	Action   string
+	MatchID  string `json:"match_id"`
+	TeamID   string `json:"team_id"`
+	PlayerID string `json:"player_id"`
+	Minute   int    `json:"minute"`
+	Action   string `json:"action"`
 }
 
 type AddActionUseCase struct {
