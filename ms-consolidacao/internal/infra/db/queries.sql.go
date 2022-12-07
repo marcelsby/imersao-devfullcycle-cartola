@@ -438,17 +438,17 @@ func (q *Queries) UpdateMatch(ctx context.Context, arg UpdateMatchParams) error 
 	return err
 }
 
-const updateMyTeamsScore = `-- name: UpdateMyTeamsScore :exec
+const updateMyTeamScore = `-- name: UpdateMyTeamScore :exec
 UPDATE my_team SET score = ? WHERE id IN (?)
 `
 
-type UpdateMyTeamsScoreParams struct {
+type UpdateMyTeamScoreParams struct {
 	Score float64 `json:"score"`
 	ID    string  `json:"id"`
 }
 
-func (q *Queries) UpdateMyTeamsScore(ctx context.Context, arg UpdateMyTeamsScoreParams) error {
-	_, err := q.db.ExecContext(ctx, updateMyTeamsScore, arg.Score, arg.ID)
+func (q *Queries) UpdateMyTeamScore(ctx context.Context, arg UpdateMyTeamScoreParams) error {
+	_, err := q.db.ExecContext(ctx, updateMyTeamScore, arg.Score, arg.ID)
 	return err
 }
 

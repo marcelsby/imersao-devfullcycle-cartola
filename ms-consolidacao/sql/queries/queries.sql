@@ -7,7 +7,7 @@ INSERT INTO players (id, name, price) VALUES (?, ?, ?);
 -- name: UpdatePlayer :exec
 UPDATE players SET name = ?, price = ? WHERE id = ?;
 
--- name: UpdateMyTeamsScore :exec
+-- name: UpdateMyTeamScore :exec
 UPDATE my_team SET score = ? WHERE id IN (?);
 
 -- name: AddScoreToTeam :exec
