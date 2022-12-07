@@ -20,6 +20,12 @@ type AddMatchUseCase struct {
 	Uow uow.UowInterface
 }
 
+func NewAddMatchUseCase(uow uow.UowInterface) *AddMatchUseCase {
+	return &AddMatchUseCase{
+		Uow: uow,
+	}
+}
+
 func (a *AddMatchUseCase) Execute(ctx context.Context, input AddMatchInput) error {
 	return a.Uow.Do(ctx, func(uow *uow.Uow) error {
 		matchRepository := a.getMatchRepository(ctx)

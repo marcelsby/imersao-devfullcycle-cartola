@@ -21,6 +21,13 @@ type AddActionUseCase struct {
 	ActionTable entity.ActionTableInterface
 }
 
+func NewAddActionUseCase(uow uow.UowInterface, actionTable entity.ActionTableInterface) *AddActionUseCase {
+	return &AddActionUseCase{
+		Uow:         uow,
+		ActionTable: actionTable,
+	}
+}
+
 func (a *AddActionUseCase) Execute(ctx context.Context, input AddActionInput) error {
 	return a.Uow.Do(ctx, func(uow *uow.Uow) error {
 		matchRepository := a.getMatchRepository(ctx)

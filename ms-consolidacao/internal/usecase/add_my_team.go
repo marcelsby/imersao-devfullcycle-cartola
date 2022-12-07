@@ -18,6 +18,12 @@ type AddMyTeamUseCase struct {
 	Uow uow.UowInterface
 }
 
+func NewAddMyTeamUseCase(uow uow.UowInterface) *AddMyTeamUseCase {
+	return &AddMyTeamUseCase{
+		Uow: uow,
+	}
+}
+
 func (a *AddMyTeamUseCase) Execute(ctx context.Context, input AddMyTeamInput) error {
 	myTeamRepository := a.getMyTeamRepository(ctx)
 	myTeam := entity.NewMyTeam(input.ID, input.Name)
