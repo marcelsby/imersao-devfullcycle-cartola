@@ -3,10 +3,15 @@ package main
 import (
 	"context"
 	"database/sql"
+	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/marcelsby/imersao-devfullcycle-cartola-consolidacao/internal/infra/db"
+	httphandler "github.com/marcelsby/imersao-devfullcycle-cartola-consolidacao/internal/infra/http"
 	"github.com/marcelsby/imersao-devfullcycle-cartola-consolidacao/internal/infra/repository"
 	"github.com/marcelsby/imersao-devfullcycle-cartola-consolidacao/pkg/uow"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
@@ -26,6 +31,17 @@ func main() {
 
 	registerRepositories(uow)
 
+	router := chi.NewRouter()
+
+	router.Get("/players", httphandler.ListPlayersHandler(ctx, *db.New(dbConnection)))
+	router.Get("/my-teams/{teamID}/players", httphandler.ListMyTeamPlayers(ctx, *db.New(dbConnection)))
+	router.Get("/my-teams/{teamID}/balance", httphandler.GetMyTeamBalanceHandler(ctx, *db.New(dbConnection)))
+	router.Get("/matches", httphandler.ListMatchesHandler(ctx, repository.NewMatchRepository(dbConnection)))
+	router.Get("/matches/{matchID}", httphandler.ListMatchByIDHandler(ctx, repository.NewMatchRepository(dbConnection)))
+
+	if err = http.ListenAndServe(":8080", router); err != nil {
+		panic(err)
+	}
 }
 
 func registerRepositories(uow *uow.Uow) {
