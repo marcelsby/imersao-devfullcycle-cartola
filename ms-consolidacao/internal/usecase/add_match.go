@@ -11,7 +11,7 @@ import (
 
 type AddMatchInput struct {
 	ID      string    `json:"id"`
-	Date    time.Time `json:"date"`
+	Date    time.Time `json:"match_date"`
 	TeamAID string    `json:"team_a_id"`
 	TeamBID string    `json:"team_b_id"`
 }

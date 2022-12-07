@@ -5,9 +5,11 @@ import (
 	"database/sql"
 	"net/http"
 
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/go-chi/chi/v5"
 	"github.com/marcelsby/imersao-devfullcycle-cartola-consolidacao/internal/infra/db"
 	httphandler "github.com/marcelsby/imersao-devfullcycle-cartola-consolidacao/internal/infra/http"
+	"github.com/marcelsby/imersao-devfullcycle-cartola-consolidacao/internal/infra/kafka/consumer"
 	"github.com/marcelsby/imersao-devfullcycle-cartola-consolidacao/internal/infra/repository"
 	"github.com/marcelsby/imersao-devfullcycle-cartola-consolidacao/pkg/uow"
 
@@ -17,7 +19,7 @@ import (
 func main() {
 	ctx := context.Background()
 
-	dbConnection, err := sql.Open("mysql", "root:root@tcp(localhost:3306)/cartola?parseTime=true")
+	dbConnection, err := sql.Open("mysql", "root:root@tcp(mysql:3306)/cartola?parseTime=true")
 	if err != nil {
 		panic(err)
 	}
@@ -39,9 +41,12 @@ func main() {
 	router.Get("/matches", httphandler.ListMatchesHandler(ctx, repository.NewMatchRepository(dbConnection)))
 	router.Get("/matches/{matchID}", httphandler.ListMatchByIDHandler(ctx, repository.NewMatchRepository(dbConnection)))
 
-	if err = http.ListenAndServe(":8080", router); err != nil {
-		panic(err)
-	}
+	go http.ListenAndServe(":8080", router)
+
+	var topics = []string{"newMatch", "chooseTeam", "newPlayer", "updateMatchResult", "newAction"}
+	msgChan := make(chan *kafka.Message)
+	go consumer.Consume(topics, "broker:9094", msgChan)
+	consumer.ProcessEvents(ctx, msgChan, uow)
 }
 
 func registerRepositories(uow *uow.Uow) {
