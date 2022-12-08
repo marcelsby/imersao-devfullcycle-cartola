@@ -1,4 +1,7 @@
 {
     "python.defaultInterpreterPath": "/home/python/app/.env/bin/python",
-    "python.terminal.activateEnvironment": true
+    "python.terminal.activateEnvironment": true,
+    "files.exclude": {
+        "**/__pycache__": true
+    }
 }

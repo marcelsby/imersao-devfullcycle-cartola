@@ -3,3 +3,5 @@ services:
     build: .
     volumes:
       - .:/home/python/app
+    ports:
+      - "8000:8000"

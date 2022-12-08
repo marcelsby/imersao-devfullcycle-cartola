@@ -21,7 +21,9 @@
 	"extensions": [
 		"sourcery.sourcery",
 		"ms-python.python",
-		"SonarSource.sonarlint-vscode"
+		"SonarSource.sonarlint-vscode",
+		"ms-azuretools.vscode-docker",
+		"bungcip.better-toml"
 	]
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
