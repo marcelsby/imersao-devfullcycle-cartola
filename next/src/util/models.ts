@@ -17,7 +17,7 @@ export const PlayersMap: { [key: string]: string } = {
 }
 
 export type Action = {
-  player_name: string
+  playerName: string
   minutes: number
   action: "goal" | "yellow card" | "red card" | "assist"
   score: number
@@ -25,10 +25,10 @@ export type Action = {
 
 export type Match = {
   id: string
-  match_date: string
-  team_a: string //Brasil
-  team_b: string //Argentina
-  result: string //'1-0'
+  matchDate: string
+  teamA: string //Brasil
+  teamB: string //Argentina
+  score: string //'1-0'
   //score: number;
   actions: Action[]
 }

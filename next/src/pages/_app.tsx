@@ -5,7 +5,6 @@ import { CacheProvider, EmotionCache } from "@emotion/react"
 import createEmotionCache from "../util/createEmotionCache"
 import theme from "../util/theme"
 import { Navbar } from "../components/Navbar"
-// import { Navbar } from "../components/Navbar";
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()

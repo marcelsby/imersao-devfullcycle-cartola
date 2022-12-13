@@ -67,7 +67,7 @@ const HomePage: NextPage = () => {
                 }}
               >
                 <Label>Patrimônio</Label>
-                <Label>300m </Label>
+                <Label>300</Label>
               </Grid>
             </Grid>
           </BudgetContainer>
