@@ -4,7 +4,6 @@ import Image from "next/image"
 import Link, { LinkProps } from "next/link"
 import { useRouter } from "next/router"
 import { PropsWithChildren } from "react"
-import { roboto } from "../util/theme"
 
 export type NavbarItemProps = LinkProps & { showUnderline: boolean }
 
@@ -36,7 +35,6 @@ export const NavbarItem = (props: PropsWithChildren<NavbarItemProps>) => {
 
 export const Navbar = () => {
   const router = useRouter()
-  console.log(router.pathname)
 
   return (
     <Box sx={{ flexGrow: 1 }}>

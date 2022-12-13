@@ -22,6 +22,7 @@ import { TeamLogo } from "../components/TeamLogo"
 import { Player, PlayersMap } from "../util/models"
 import PersonIcon from "@mui/icons-material/Person2"
 import DeleteIcon from "@mui/icons-material/Delete"
+import { httpAdmin } from "../util/http"
 
 const players = [
   {
@@ -45,34 +46,34 @@ const players = [
     price: 25,
   },
   {
-    id: "5",
+    id: "0b8f08d8d8714a42b39517d698f477db",
     name: "De Bruyne",
     price: 15,
   },
   {
-    id: "6",
+    id: "67fbf409d94f485884238043576cda05",
     name: "Lewandowski",
     price: 15,
   },
   {
-    id: "7",
+    id: "c7830b65cf7949b7a87882250fec1d94",
     name: "Maguirre",
     price: 15,
   },
   {
-    id: "8",
+    id: "5ce233a85cd84a8581569ac255cf909e",
     name: "Richarlison",
     price: 15,
   },
   {
-    id: "9",
+    id: "0c9ba4fb4609464d9845421ca1e1e3bd",
     name: "Harry Kane",
     price: 15,
   },
 ]
 
 const fakePlayer = {
-  id: 0,
+  id: null,
   name: "Escolha o jogador",
   price: 0,
 }
@@ -91,17 +92,17 @@ const fakePlayers: Player[] = new Array(totalPlayers)
   .map((_, key) => makeFakePlayer(key))
 
 const ListPlayersPage: NextPage = () => {
-  const [playersSelected, setPlayersSelected] = useState(fakePlayers)
+  const [selectedPlayers, setPlayersSelected] = useState(fakePlayers)
 
   const countPlayersUsed = useMemo(
-    () => playersSelected.filter((player) => player.id !== 0).length,
-    [playersSelected]
+    () => selectedPlayers.filter((player) => player.id !== null).length,
+    [selectedPlayers]
   )
 
   const remainingBudget = useMemo(
     () =>
-      balance - playersSelected.reduce((acc, player) => acc + player.price, 0),
-    [playersSelected]
+      balance - selectedPlayers.reduce((acc, player) => acc + player.price, 0),
+    [selectedPlayers]
   )
 
   const addPlayer = useCallback((player: Player) => {
@@ -109,7 +110,7 @@ const ListPlayersPage: NextPage = () => {
       const hasFound = prev.find((p) => p.id === player.id)
       if (hasFound) return prev
 
-      const firstIndexFakePlayer = prev.findIndex((p) => p.id === 0)
+      const firstIndexFakePlayer = prev.findIndex((p) => p.id === null)
       if (firstIndexFakePlayer === -1) return prev
 
       const newPlayers = [...prev]
@@ -130,6 +131,13 @@ const ListPlayersPage: NextPage = () => {
       return newPlayers
     })
   }, [])
+
+  const saveMyPlayers = useCallback(async () => {
+    await httpAdmin.put(
+      "/my-teams/22087246-01bc-46ad-a9d9-a99a6d734167/players",
+      { players_uuid: selectedPlayers.map((player) => player.id) }
+    )
+  }, [selectedPlayers])
 
   return (
     <Page>
@@ -171,13 +179,12 @@ const ListPlayersPage: NextPage = () => {
                 <Autocomplete
                   sx={{ width: 400 }}
                   isOptionEqualToValue={(option, value) => {
-                    console.log(option)
                     return option.name
                       .toLowerCase()
                       .includes(value.name.toLowerCase())
                   }}
                   getOptionLabel={(option) => option.name}
-                  options={players!}
+                  options={players}
                   onChange={(_event, newValue) => {
                     if (!newValue) {
                       return
@@ -223,13 +230,13 @@ const ListPlayersPage: NextPage = () => {
               <Grid item xs={6}>
                 <Label>Meu time</Label>
                 <List>
-                  {playersSelected.map((player, key) => (
+                  {selectedPlayers.map((player, key) => (
                     <React.Fragment key={key}>
                       <ListItem
                         secondaryAction={
                           <IconButton
                             edge="end"
-                            disabled={player.id === 0}
+                            disabled={player.id === null}
                             onClick={() => removePlayer(key)}
                           >
                             <DeleteIcon />
@@ -238,7 +245,7 @@ const ListPlayersPage: NextPage = () => {
                       >
                         <ListItemAvatar>
                           <Avatar>
-                            {player.id === 0 ? (
+                            {player.id === null ? (
                               <PersonIcon />
                             ) : (
                               <Image
@@ -268,6 +275,7 @@ const ListPlayersPage: NextPage = () => {
             variant="contained"
             size="large"
             disabled={countPlayersUsed < totalPlayers || remainingBudget < 0}
+            onClick={saveMyPlayers}
           >
             Escalar
           </Button>

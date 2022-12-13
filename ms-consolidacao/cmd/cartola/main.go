@@ -7,6 +7,7 @@ import (
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 	"github.com/marcelsby/imersao-devfullcycle-cartola-consolidacao/internal/infra/db"
 	httphandler "github.com/marcelsby/imersao-devfullcycle-cartola-consolidacao/internal/infra/http"
 	"github.com/marcelsby/imersao-devfullcycle-cartola-consolidacao/internal/infra/kafka/consumer"
@@ -35,6 +36,15 @@ func main() {
 
 	router := chi.NewRouter()
 
+	router.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"https://*", "http://*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
+
 	router.Get("/players", httphandler.ListPlayersHandler(ctx, *db.New(dbConnection)))
 	router.Get("/my-teams/{teamID}/players", httphandler.ListMyTeamPlayers(ctx, *db.New(dbConnection)))
 	router.Get("/my-teams/{teamID}/balance", httphandler.GetMyTeamBalanceHandler(ctx, *db.New(dbConnection)))
@@ -45,7 +55,7 @@ func main() {
 
 	var topics = []string{"newMatch", "chooseTeam", "newPlayer", "updateMatchResult", "newAction"}
 	msgChan := make(chan *kafka.Message)
-	go consumer.Consume(topics, "broker:9094", msgChan)
+	go consumer.Consume(topics, "host.docker.internal:9094", msgChan)
 	consumer.ProcessEvents(ctx, msgChan, uow)
 }
 

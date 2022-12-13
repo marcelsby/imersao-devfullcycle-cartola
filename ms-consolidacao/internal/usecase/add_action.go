@@ -68,7 +68,7 @@ func (a *AddActionUseCase) Execute(ctx context.Context, input AddActionInput) er
 			return err
 		}
 
-		myTeam, err := myTeamRepository.FindByID(ctx, input.TeamID)
+		myTeam, err := myTeamRepository.FindByID(ctx, "22087246-01bc-46ad-a9d9-a99a6d734167")
 
 		if err != nil {
 			return err

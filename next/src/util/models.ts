@@ -1,5 +1,5 @@
 export type Player = {
-  id: number
+  id: string | null
   name: string
   price: number
 }
