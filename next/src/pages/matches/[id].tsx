@@ -83,6 +83,12 @@ const ShowMatchPage: NextPage = () => {
     { refreshInterval: 5000 }
   )
 
+  const matchTotalScore =
+    match &&
+    match.actions
+      .map((action) => action.score)
+      .reduce((prevScore, actualScore) => prevScore + actualScore, 0)
+
   return (
     <Page>
       {match && (
@@ -158,7 +164,7 @@ const ShowMatchPage: NextPage = () => {
                         1 > 0 ? green[500] : theme.palette.primary.main,
                     }}
                   >
-                    -- pts
+                    {matchTotalScore} pts
                   </Typography>
                 </Box>
               }
