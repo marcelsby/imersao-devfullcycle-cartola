@@ -14,7 +14,7 @@ import {
 } from "@mui/material"
 import { NextPage } from "next"
 import Image from "next/image"
-import React, { useCallback, useMemo, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { Label } from "../components/Label"
 import { Page } from "../components/Page"
 import { Section } from "../components/Section"
@@ -22,55 +22,8 @@ import { TeamLogo } from "../components/TeamLogo"
 import { Player, PlayersMap } from "../util/models"
 import PersonIcon from "@mui/icons-material/Person2"
 import DeleteIcon from "@mui/icons-material/Delete"
-import { httpAdmin } from "../util/http"
-
-const players = [
-  {
-    id: "64fb9c2f-a45b-4f96-9d8b-b127878ca6f3",
-    name: "Messi",
-    price: 35,
-  },
-  {
-    id: "4876d14f-d998-4abf-96ef-89fd53185464",
-    name: "Cristiano Ronaldo",
-    price: 35,
-  },
-  {
-    id: "0f463bea-1dbd-4765-b080-9f5f170b6ded",
-    name: "Neymar",
-    price: 25,
-  },
-  {
-    id: "c707bfa9-074e-4636-8772-633e4b56248d",
-    name: "Vinicius Junior",
-    price: 25,
-  },
-  {
-    id: "0b8f08d8d8714a42b39517d698f477db",
-    name: "De Bruyne",
-    price: 15,
-  },
-  {
-    id: "67fbf409d94f485884238043576cda05",
-    name: "Lewandowski",
-    price: 15,
-  },
-  {
-    id: "c7830b65cf7949b7a87882250fec1d94",
-    name: "Maguirre",
-    price: 15,
-  },
-  {
-    id: "5ce233a85cd84a8581569ac255cf909e",
-    name: "Richarlison",
-    price: 15,
-  },
-  {
-    id: "0c9ba4fb4609464d9845421ca1e1e3bd",
-    name: "Harry Kane",
-    price: 15,
-  },
-]
+import { fetcherStats, httpAdmin } from "../util/http"
+import { useHttp } from "../hooks/useHttp"
 
 const fakePlayer = {
   id: null,
@@ -83,8 +36,6 @@ const makeFakePlayer = (key: number) => ({
   name: `${fakePlayer.name} ${key + 1}`,
 })
 
-const balance = 300
-
 const totalPlayers = 4
 
 const fakePlayers: Player[] = new Array(totalPlayers)
@@ -92,7 +43,22 @@ const fakePlayers: Player[] = new Array(totalPlayers)
   .map((_, key) => makeFakePlayer(key))
 
 const ListPlayersPage: NextPage = () => {
-  const [selectedPlayers, setPlayersSelected] = useState(fakePlayers)
+  const { data: myPlayers } = useHttp(
+    "/my-teams/22087246-01bc-46ad-a9d9-a99a6d734167/players",
+    fetcherStats
+  )
+
+  const { data: balanceData } = useHttp(
+    "/my-teams/22087246-01bc-46ad-a9d9-a99a6d734167/balance",
+    fetcherStats,
+    { refreshInterval: 5000 }
+  )
+
+  const { data: players } = useHttp<Player[]>("/players", fetcherStats, {
+    fallbackData: [],
+  })
+
+  const [selectedPlayers, setSelectedPlayers] = useState(fakePlayers)
 
   const countPlayersUsed = useMemo(
     () => selectedPlayers.filter((player) => player.id !== null).length,
@@ -101,12 +67,26 @@ const ListPlayersPage: NextPage = () => {
 
   const remainingBudget = useMemo(
     () =>
-      balance - selectedPlayers.reduce((acc, player) => acc + player.price, 0),
-    [selectedPlayers]
+      !balanceData
+        ? 0
+        : balanceData.balance -
+          selectedPlayers.reduce((acc, player) => acc + player.price, 0),
+    [selectedPlayers, balanceData]
   )
 
+  useEffect(() => {
+    if (!myPlayers) {
+      return
+    }
+
+    setSelectedPlayers((prev) => {
+      console.log(prev.slice(myPlayers.length))
+      return [...myPlayers, ...prev.slice(myPlayers.length)]
+    })
+  }, [myPlayers])
+
   const addPlayer = useCallback((player: Player) => {
-    setPlayersSelected((prev) => {
+    setSelectedPlayers((prev) => {
       const hasFound = prev.find((p) => p.id === player.id)
       if (hasFound) return prev
 
@@ -121,7 +101,7 @@ const ListPlayersPage: NextPage = () => {
   }, [])
 
   const removePlayer = useCallback((index: number) => {
-    setPlayersSelected((prev) => {
+    setSelectedPlayers((prev) => {
       const newPlayers = prev.map((player, key) => {
         if (key === index) {
           return makeFakePlayer(key)
@@ -184,7 +164,7 @@ const ListPlayersPage: NextPage = () => {
                       .includes(value.name.toLowerCase())
                   }}
                   getOptionLabel={(option) => option.name}
-                  options={players}
+                  options={players!}
                   onChange={(_event, newValue) => {
                     if (!newValue) {
                       return

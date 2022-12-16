@@ -4,12 +4,15 @@ import Image from "next/image"
 import Link, { LinkProps } from "next/link"
 import { useRouter } from "next/router"
 import { PropsWithChildren } from "react"
+import { useHttp } from "../hooks/useHttp"
+import { fetcherStats } from "../util/http"
 
 export type NavbarItemProps = LinkProps & { showUnderline: boolean }
 
-export const NavbarItem = (props: PropsWithChildren<NavbarItemProps>) => {
-  const { showUnderline, ...linkProps } = props
-
+export const NavbarItem = ({
+  showUnderline,
+  ...linkProps
+}: PropsWithChildren<NavbarItemProps>) => {
   return (
     //@ts-expect-error
     <Button
@@ -35,6 +38,12 @@ export const NavbarItem = (props: PropsWithChildren<NavbarItemProps>) => {
 
 export const Navbar = () => {
   const router = useRouter()
+
+  const { data } = useHttp(
+    "/my-teams/22087246-01bc-46ad-a9d9-a99a6d734167/balance",
+    fetcherStats,
+    { refreshInterval: 5000 }
+  )
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -70,7 +79,11 @@ export const Navbar = () => {
               Jogo
             </NavbarItem>
           </Box>
-          <Chip label={"300"} avatar={<Avatar>C$</Avatar>} color="secondary" />
+          <Chip
+            label={data ? data.balance : 0}
+            avatar={<Avatar>C$</Avatar>}
+            color="secondary"
+          />
         </Toolbar>
       </AppBar>
     </Box>
