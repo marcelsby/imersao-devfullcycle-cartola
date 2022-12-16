@@ -18,7 +18,7 @@ func CreateProcessMessageStrategy(topic string) event.ProcessEventStrategy {
 	case "newAction":
 		// {"match_id":"3","team_id":"1","player_id":"1","action":"goal","minutes":10}
 		return event.ProcessNewAction{}
-	case "matchUpdateResult":
+	case "updateMatchResult":
 		// {"match_id":"1","result":"2-0"}
 		return event.ProcessUpdateMatchResult{}
 	}

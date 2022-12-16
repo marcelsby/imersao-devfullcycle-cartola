@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/marcelsby/imersao-devfullcycle-cartola-consolidacao/internal/domain/entity"
 	"github.com/marcelsby/imersao-devfullcycle-cartola-consolidacao/internal/domain/repository"
@@ -47,9 +48,11 @@ func (a *AddActionUseCase) Execute(ctx context.Context, input AddActionInput) er
 		}
 
 		newAction := entity.NewGameAction(input.PlayerID, input.TeamID, input.Minute, input.Action, score)
+		fmt.Println("match.Actions (before update):", match.Actions)
 		match.Actions = append(match.Actions, *newAction)
 
-		err = matchRepository.SaveActions(ctx, match, float64(score))
+		fmt.Println("match.Actions (after update):", match.Actions)
+		err = matchRepository.SaveActions(ctx, match)
 
 		if err != nil {
 			return err
@@ -75,7 +78,6 @@ func (a *AddActionUseCase) Execute(ctx context.Context, input AddActionInput) er
 		}
 
 		err = myTeamRepository.AddScore(ctx, myTeam, float64(score))
-
 		if err != nil {
 			return err
 		}

@@ -17,7 +17,7 @@ type MyTeamRepositoryInterface interface {
 
 type MatchRepositoryInterface interface {
 	Create(ctx context.Context, match *entity.Match) error
-	SaveActions(ctx context.Context, match *entity.Match, score float64) error
+	SaveActions(ctx context.Context, match *entity.Match) error
 	FindByID(ctx context.Context, id string) (*entity.Match, error)
 	Update(ctx context.Context, match *entity.Match) error
 	FindAll(ctx context.Context) ([]*entity.Match, error)

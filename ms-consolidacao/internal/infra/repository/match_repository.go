@@ -35,12 +35,24 @@ func (r *MatchRepository) Create(ctx context.Context, match *entity.Match) error
 	})
 }
 
-func (r *MatchRepository) SaveActions(ctx context.Context, match *entity.Match, score float64) error {
+func (r *MatchRepository) SaveActions(ctx context.Context, match *entity.Match) error {
 	err := r.deleteMatchActions(ctx, match.ID)
 	if err != nil {
 		return err
 	}
+	fmt.Println("Iterando e salvando as Actions")
 	for _, action := range match.Actions {
+
+		fmt.Println(db.CreateActionParams{
+			ID:       action.ID,
+			MatchID:  match.ID,
+			TeamID:   action.TeamID,
+			PlayerID: action.PlayerID,
+			Minute:   int32(action.Minute),
+			Action:   action.Action,
+			Score:    float64(action.Score),
+		})
+
 		err := r.Queries.CreateAction(ctx, db.CreateActionParams{
 			ID:       action.ID,
 			MatchID:  match.ID,
@@ -48,7 +60,7 @@ func (r *MatchRepository) SaveActions(ctx context.Context, match *entity.Match, 
 			PlayerID: action.PlayerID,
 			Minute:   int32(action.Minute),
 			Action:   action.Action,
-			Score:    score,
+			Score:    float64(action.Score),
 		})
 		if err != nil {
 			fmt.Println(err)
@@ -98,9 +110,11 @@ func (r *MatchRepository) FindByID(ctx context.Context, id string) (*entity.Matc
 		gameActions = append(gameActions, entity.GameAction{
 			ID:         action.ID,
 			PlayerID:   action.PlayerID,
+			TeamID:     action.TeamID,
 			PlayerName: playerInfo.Name,
 			Minute:     int(action.Minute),
 			Action:     action.Action,
+			Score:      int(action.Score),
 		})
 	}
 
