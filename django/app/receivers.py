@@ -1,6 +1,6 @@
 import json
 
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save, pre_save, m2m_changed
 from django.dispatch import receiver
 
 from .models import Action, Match, MyTeam, Player, Team
@@ -18,13 +18,17 @@ def publish_player_created(sender, instance: Player, created: bool, **kwargs):
         }))
 
 
-@receiver(post_save, sender=MyTeam)
-def publish_my_team_players_updated(sender, instance: MyTeam, created: bool, **kwargs):
-    print('My players saved')
-    safe_publish_message('chooseTeam', json.dumps({
-        'my_team_id': str(instance.uuid),
-        'players': [str(player.uuid) for player in instance.players.all()]
-    }))
+@receiver(m2m_changed, sender=MyTeam.players.through)
+def publish_my_team_players_updated(sender, instance: MyTeam, action: str, **kwargs):
+    if action == 'post_add':
+        print('My players saved')
+        my_team = MyTeam.objects.get(pk=instance.id)
+        safe_publish_message(
+            'chooseTeam',
+            json.dumps({
+                'my_team_id': str(instance.uuid),
+                'players': [str(player.uuid) for player in my_team.players.all()]
+            }))
 
 
 @receiver(post_save, sender=Team)
@@ -40,8 +44,8 @@ def publish_match_created(sender, instance: Match, created: bool, **kwargs):
         safe_publish_message('newMatch', json.dumps({
             'id': str(instance.uuid),
             'match_date': instance.match_date.isoformat(),
-            'team_a_id': instance.team_a.uuid,
-            'team_b_id': instance.team_b.uuid
+            'team_a_id': str(instance.team_a.uuid),
+            'team_b_id': str(instance.team_b.uuid)
         }))
 
 

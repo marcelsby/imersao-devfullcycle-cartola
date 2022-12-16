@@ -54,8 +54,8 @@ class Action(UUIDModel):
     class Actions(models.TextChoices):
         GOAL = 'goal', 'Goal'
         ASSIST = 'assist', 'Assist'
-        YELLOW_CARD = 'yellow_card', 'Yellow Card'
-        RED_CARD = 'red_card', 'Red Card'
+        YELLOW_CARD = 'yellow card', 'Yellow Card'
+        RED_CARD = 'red card', 'Red Card'
 
     action = models.CharField(max_length=50, choices=Actions.choices)
 
